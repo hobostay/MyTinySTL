@@ -71,10 +71,57 @@ private:
 };
 
 
-// TODO 
-// template<typename T, typename CharT = char,
-//          typename Traits = char_traits<CharT> >
-// class ostream_iterator : public iterator<output_iterator_tag, void, void, void, void> {};
+template<typename T, typename CharT = char,
+        typename Traits = std::char_traits<CharT>>
+class ostream_iterator
+: public iterator<output_iterator_tag, void, void, void, void>
+{
+public:
+    using char_type = CharT;
+    using traits_type = Traits;
+    using ostream_type = std::basic_ostream<CharT, Traits>;
+
+    ostream_iterator()
+        : m_stream(nullptr), m_delimiter(nullptr) {}
+
+    ostream_iterator(ostream_type& os)
+        : m_stream(std::addressof(os)), m_delimiter(nullptr) {}
+
+    ostream_iterator(ostream_type& os, const CharT* delimiter)
+        : m_stream(std::addressof(os)), m_delimiter(delimiter) {}
+
+    ostream_iterator(const ostream_iterator& other)
+        : m_stream(other.m_stream), m_delimiter(other.m_delimiter) {}
+
+    ostream_iterator& operator=(const ostream_iterator&) = default;
+
+    ~ostream_iterator() = default;
+
+    ostream_iterator& operator=(const T& value) {
+        MYSTL_DEBUG(m_stream != nullptr);
+        *m_stream << value;
+        if (m_delimiter) {
+            *m_stream << m_delimiter;
+        }
+        return *this;
+    }
+
+    ostream_iterator& operator*() {
+        return *this;
+    }
+
+    ostream_iterator& operator++() {
+        return *this;
+    }
+
+    ostream_iterator operator++(int) {
+        return *this;
+    }
+
+private:
+    ostream_type* m_stream;
+    const CharT* m_delimiter;
+};
 }
 
 
